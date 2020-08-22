@@ -60,10 +60,10 @@ module.exports = function () {
     const srvRecords = Object.keys(records.SRV).find(k => k === domain)
     if (srvRecords) {
       if (!records.SRV[srvRecords].find(r => r.port === port && r.address === address)) {
-        records.SRV[domain].push(new named.SRVRecord(address, port, options))
+        records.SRV[domain].push({cname: address, port: port})
       }
     } else {
-       records.SRV[domain] = [new named.SRVRecord(address, port, options)]
+       records.SRV[domain] = [{cname: address, port: port}]
     }    
   }
 
