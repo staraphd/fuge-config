@@ -45,7 +45,8 @@ module.exports = function () {
             system.global.dns.A[result[1]] = {address: result[2]}
           }
         } else {
-          system.global.dns.SRV[result[1]] = {cname: result[5], port: result[4]}
+          //system.global.dns.SRV[result[1]] = {cname: result[5], port: result[4]}
+          addSrvRecord(system.global.dns, result[1], result[5], result[4])
         }
 
         if (!result) {
@@ -55,6 +56,16 @@ module.exports = function () {
     }
   }
 
+  function addSrvRecord(records, domain, address, port) {
+    const srvRecords = Object.keys(records.SRV).find(k => k === domain)
+    if (srvRecords) {
+      if (!records.SRV[srvRecords].find(r => r.port === port && r.address === address)) {
+        records.SRV[domain].push(new named.SRVRecord(address, port, options))
+      }
+    } else {
+       records.SRV[domain] = [new named.SRVRecord(address, port, options)]
+    }    
+  }
 
   return {
     addExternalDns: addExternalDns
