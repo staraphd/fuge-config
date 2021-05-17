@@ -63,7 +63,7 @@ module.exports = function () {
       _.each(include, function (filePath) {
         var composeFilePath = path.resolve(path.join(path.dirname(yamlPath), filePath))
         toProcess.push({composeRootPath: path.dirname(composeFilePath),
-          contents: yaml.safeLoad(fs.readFileSync(composeFilePath, 'utf8'))})
+          contents: yaml.load(fs.readFileSync(composeFilePath, 'utf8'))})
       })
       fugeYml.include = null
       delete fugeYml.include
