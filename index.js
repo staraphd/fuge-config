@@ -267,7 +267,7 @@ module.exports = function () {
       yml = yaml.load(fs.readFileSync(yamlPath, 'utf8'))
 
       // replace placeholder $localhost with the matching network ipaddress if transalate_localhost is configured
-      if (yml.translate_localhost) {
+      if (yml.fuge_global && yml.fuge_global.translate_localhost) {
         const ip = Object.entries(os.networkInterfaces()).map(e =>
           e[1]
             .map(a => a.family === 'IPv4' && !a.internal ? a.address : null) // result: [ 'w.x.y.z' ], [ null ], [ null, null ], [ null ], [ null ]
@@ -275,10 +275,10 @@ module.exports = function () {
         ).flat() // result: [ 'w.x.y.z' ]
 
         let ipToUse
-        if (yml.translate_localhost.ip_mask) {
-          const ipMatch = ip.filter(a => a.startsWith(yml.translate_localhost.ip_mask))
+        if (yml.fuge_global.translate_localhost.ip_mask) {
+          const ipMatch = ip.filter(a => a.startsWith(yml.fuge_global.translate_localhost.ip_mask))
           if (ipMatch.length > 0) ipToUse = ipMatch[0]
-          else return cb(`No network interface ipaddress matches to requested prefix ${yml.translate_localhost.ip_mask}`)
+          else return cb(`No network interface ipaddress matches to requested prefix ${yml.fuge_global.translate_localhost.ip_mask}`)
         } else {
           // use the first network ipaddress available as not mask is configured
           if (ip.length > 0) ipToUse = ip[0]
