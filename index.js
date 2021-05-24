@@ -25,7 +25,7 @@ var kubeEnv = require('./kubeEnv')()
 var extDns = require('./externalDns')()
 var ev = require('./environment')()
 var os = require('os')
-
+const envRegex = /(%[A-Z])\w+%/g
 
 /**
  * loads a fuge yaml configuration file and returns a javascript object describing the system
@@ -139,6 +139,24 @@ module.exports = function () {
         } else {
           system.topology.containers[key].environment = _.merge(_.cloneDeep(system.global.environment), env)
         }
+
+        // replace environment placeholders with actual values
+        // example: if environment value is %HOSTNAME%:8080, then value for this env must be taken resolved to hostxxx:8080
+        // where hostxxx is resolved from environment variable
+        const containerEnvs = Object.keys(system.topology.containers[key].environment)
+        containerEnvs.forEach(envkey => {
+          var envValue = system.topology.containers[key].environment[envkey]
+          envValue.match(envRegex).forEach(e => {
+            var sysEnvName = e.substring(1, e.length - 1)
+            if (process.env[sysEnvName]) {
+              envValue = envValue.replace(e, process.env[sysEnvName])
+            }
+          })
+          if (system.topology.containers[key].environment[envkey] !== envValue) {
+            system.topology.containers[key].environment[envkey] = envValue
+          }
+        })
+
 
         // create ports block for this container
         if (system.topology.containers[key].ports && system.topology.containers[key].ports.length > 0) {
