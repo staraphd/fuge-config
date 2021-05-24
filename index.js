@@ -146,17 +146,20 @@ module.exports = function () {
         const containerEnvs = Object.keys(system.topology.containers[key].environment)
         containerEnvs.forEach(envkey => {
           var envValue = system.topology.containers[key].environment[envkey]
-          envValue.match(envRegex).forEach(e => {
-            var sysEnvName = e.substring(1, e.length - 1)
-            if (process.env[sysEnvName]) {
-              envValue = envValue.replace(e, process.env[sysEnvName])
+          var matches = envValue.match(envRegex)
+          if (matches) {
+            matches.forEach(e => {
+              var sysEnvName = e.substring(1, e.length - 1)
+              if (process.env[sysEnvName]) {
+                envValue = envValue.replace(e, process.env[sysEnvName])
+                console.log('\tReplacing', e, '==>', process.env[sysEnvName])
+              }
+            })
+            if (system.topology.containers[key].environment[envkey] !== envValue) {
+              system.topology.containers[key].environment[envkey] = envValue
             }
-          })
-          if (system.topology.containers[key].environment[envkey] !== envValue) {
-            system.topology.containers[key].environment[envkey] = envValue
           }
         })
-
 
         // create ports block for this container
         if (system.topology.containers[key].ports && system.topology.containers[key].ports.length > 0) {
