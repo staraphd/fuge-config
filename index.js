@@ -307,7 +307,7 @@ module.exports = function () {
         }
 
         if (ipToUse) {
-          console.log(`Mapping $localhost ==> ${ipToUse}`)
+          console.log(`\tMapping $localhost ==> ${ipToUse}`)
           let ymlstr = fs.readFileSync(yamlPath, 'utf8')
           ymlstr = ymlstr.replace(/\$localhost/g, ipToUse)
           yml = yaml.load(ymlstr)
