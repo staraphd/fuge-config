@@ -161,6 +161,24 @@ module.exports = function () {
           }
         })
 
+        // replace placeholders in 'path' property for 'process' type microservice
+        if(system.topology.containers[key].type === 'process' && system.topology.containers[key].path) {
+          var pathValue = system.topology.containers[key].path;
+          const pathMatches = pathValue.match(envRegex);
+          if(pathMatches) {
+            pathMatches.forEach(p => {
+              var placeholderName = p.substring(1, p.length - 1)
+              if (process.env[placeholderName]) {
+                pathValue = pathValue.replace(p, process.env[placeholderName])
+                console.log('\t[Path match] Replacing', p, '==>', process.env[placeholderName])
+              }
+            })
+            if (system.topology.containers[key].path !== pathValue) {
+              system.topology.containers[key].path = pathValue
+            }
+          }
+        }
+
         // create ports block for this container
         if (system.topology.containers[key].ports && system.topology.containers[key].ports.length > 0) {
           ports = {}
