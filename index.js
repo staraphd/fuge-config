@@ -64,6 +64,7 @@ module.exports = function () {
           })
         }
         if (system.topology.containers[key].path) {
+          system.topology.containers[key].path = system.topology.containers[key].path.replace(/%([^%]+)%/g, (match, capturingGroup) => process.env[capturingGroup])
           var p = system.topology.containers[key].path
           if (!path.isAbsolute(p)) {
             p = path.resolve(path.join(path.dirname(yamlPath), system.topology.containers[key].path))
